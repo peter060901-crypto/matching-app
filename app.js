@@ -1,107 +1,82 @@
-function getData(){
+function me(){
   return {
-    name:document.getElementById('name').value,
-    purpose:document.getElementById('purpose').value,
-    emotion:document.getElementById('emotion').value,
-    speed:document.getElementById('speed').value,
-    conflict:document.getElementById('conflict').value,
-    energy:document.getElementById('energy').value,
-    suffering:document.getElementById('suffering').value,
-    intro:document.getElementById('intro').value
+    name:val('name'),
+    purpose:val('purpose'),
+    emotion:val('emotion'),
+    speed:val('speed'),
+    conflict:val('conflict'),
+    energy:val('energy'),
+    suffering:val('suffering'),
+    intro:val('intro')
   };
 }
 
-async function register(){
+function val(id){
+  return document.getElementById(id).value;
+}
+
+async function start(){
   await fetch('/register',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(getData())
+    body:JSON.stringify(me())
   });
 
-  show('menu');
+  showMenu();
 }
 
-async function match(){
-  const res = await fetch('/match',{
+async function explore(){
+  const res = await fetch('/explore',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(getData())
+    body:JSON.stringify(me())
   });
 
   const data = await res.json();
 
-  let html = '<h3>매칭 결과</h3>';
+  let html = '<h3>추천</h3>';
 
   data.forEach(u=>{
     html += `
-    <div style="border:1px solid #ddd; padding:10px; margin-top:10px">
+    <div class="card">
       <b>${u.name}</b><br>
-      적합도: ${u.score}<br>
-      ${u.intro || ''}<br><br>
+      점수: ${u.score}<br>
+      ${u.intro}<br><br>
+      <small>${u.reasons.join(', ')}</small><br><br>
       <button onclick="like('${u.name}')">관심</button>
-    </div>
-    `;
+    </div>`;
   });
 
-  html += '<br><button onclick="back()">뒤로</button>';
-
-  document.getElementById('result').innerHTML = html;
-  show('result');
+  document.getElementById('view').innerHTML = html;
 }
 
 async function like(name){
-  const res = await fetch('/like',{
+  await fetch('/like',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      from:document.getElementById('name').value,
+      from:val('name'),
       to:name
     })
   });
 
-  const data = await res.json();
-
-  if(!data.ok){
-    alert(data.msg);
-  } else {
-    alert("관심 표시 완료");
-  }
+  alert("관심 표시됨");
 }
 
-async function loadMatches(){
-  const name = document.getElementById('name').value;
-
-  const res = await fetch('/matches/'+name);
+async function connections(){
+  const res = await fetch('/connections/'+val('name'));
   const data = await res.json();
 
-  let html = '<h3>내 연결</h3>';
+  let html = '<h3>연결</h3>';
 
-  if(data.length === 0){
-    html += "아직 연결 없음";
-  } else {
-    data.forEach(m=>{
-      html += `
-      <div style="border:1px solid #ddd; padding:10px; margin-top:10px">
-        ${m.to}
-      </div>
-      `;
-    });
-  }
-
-  html += '<br><button onclick="back()">뒤로</button>';
-
-  document.getElementById('result').innerHTML = html;
-  show('result');
-}
-
-function show(id){
-  ['step1','menu','result'].forEach(s=>{
-    document.getElementById(s).style.display='none';
+  data.forEach(c=>{
+    html += `<div class="card">${c.to}</div>`;
   });
-  document.getElementById(id).style.display='block';
+
+  document.getElementById('view').innerHTML = html;
 }
 
-function back(){
-  show('menu');
+function showMenu(){
+  document.getElementById('onboard').style.display='none';
+  document.getElementById('menu').style.display='block';
 }
-core:document.getElementById('core').value,
