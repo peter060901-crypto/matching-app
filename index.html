@@ -3,96 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <title>결 매칭</title>
+
+<style>
+body {font-family:sans-serif; max-width:500px; margin:auto; padding:20px; background:#f5f5f5;}
+.card {background:white; padding:15px; margin-top:10px; border-radius:10px;}
+button {padding:10px; border:none; background:black; color:white; border-radius:8px;}
+select,input,textarea {width:100%; margin-bottom:10px; padding:8px;}
+</style>
+
 </head>
 
-<body style="font-family:sans-serif; max-width:500px; margin:auto; padding:20px">
+<body>
 
-<h2>결이 맞는 사람 찾기</h2>
+<h2>결이 맞는 사람</h2>
 
-<div id="step1">
+<div id="onboard">
 
-<input id="name" placeholder="이름" style="width:100%; padding:10px"><br><br>
+<input id="name" placeholder="이름">
 
-<p>관계의 목적</p>
 <select id="purpose">
-<option>편안함</option>
-<option>성장</option>
-<option>안정</option>
-<option>자극</option>
+<option>편안함</option><option>성장</option><option>안정</option><option>자극</option>
 </select>
 
-<p>감정 처리 방식</p>
 <select id="emotion">
-<option>즉시 표현</option>
-<option>정리 후 표현</option>
-<option>쌓아둠</option>
+<option>즉시 표현</option><option>정리 후 표현</option><option>쌓아둠</option>
 </select>
 
-<p>관계 속도</p>
 <select id="speed">
-<option>빠름</option>
-<option>천천히</option>
+<option>빠름</option><option>천천히</option>
 </select>
 
-<p>갈등 방식</p>
 <select id="conflict">
-<option>대화</option>
-<option>회피</option>
-<option>거리둠</option>
+<option>대화</option><option>회피</option><option>거리둠</option>
 </select>
 
-<p>에너지</p>
 <select id="energy">
-<option>안정형</option>
-<option>파동형</option>
+<option>안정형</option><option>파동형</option>
 </select>
 
-<p>괴로움 처리</p>
 <select id="suffering">
-<option>붙잡는다</option>
-<option>이해한다</option>
-<option>내려놓는다</option>
+<option>붙잡는다</option><option>이해한다</option><option>내려놓는다</option>
 </select>
 
-<p>자기소개</p>
-<textarea id="intro" style="width:100%"></textarea>
+<textarea id="intro" placeholder="한 줄 소개"></textarea>
 
-<br><br>
-<button onclick="register()">시작하기</button>
+<button onclick="start()">시작</button>
 
 </div>
 
 <div id="menu" style="display:none">
-<h3>메뉴</h3>
-<button onclick="match()">매칭 보기</button>
-<button onclick="loadMatches()">내 연결 보기</button>
+<button onclick="explore()">추천 보기</button>
+<button onclick="connections()">내 연결</button>
 </div>
 
-<div id="result" style="display:none"></div>
+<div id="view"></div>
 
 <script src="app.js"></script>
 
 </body>
 </html>
-<style>
-body {background:#f5f5f5;}
-button {
-  padding:10px;
-  border:none;
-  background:black;
-  color:white;
-  border-radius:8px;
-}
-select, input, textarea {
-  width:100%;
-  padding:8px;
-  margin-bottom:10px;
-}
-</style>
-<p>관계에서 가장 중요한 것</p>
-<select id="core">
-<option>신뢰</option>
-<option>자유</option>
-<option>안정</option>
-<option>성장</option>
-</select>
