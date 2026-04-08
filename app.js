@@ -104,3 +104,4 @@ function show(id){
 function back(){
   show('menu');
 }
+core:document.getElementById('core').value,
