@@ -6,80 +6,97 @@ app.use(express.static('public'));
 
 let users = [];
 let likes = [];
-let dailyLikes = {};
 
-// 매칭 점수
-function score(a,b){
-  let s = 0;
+// 점수 + 이유 생성
+function analyze(a,b){
+  let score = 0;
+  let reasons = [];
 
-  if(a.purpose === b.purpose) s += 5;
-  if(a.emotion === b.emotion) s += 3;
+  if(a.purpose === b.purpose){
+    score += 5;
+    reasons.push("관계의 방향이 같음");
+  }
 
-  if(a.speed === b.speed) s += 3;
-  else s -= 1;
+  if(a.emotion === b.emotion){
+    score += 3;
+    reasons.push("감정 처리 방식이 유사");
+  }
 
-  if(a.conflict === b.conflict) s += 2;
-  else s += 1;
+  if(a.speed === b.speed){
+    score += 3;
+    reasons.push("관계 속도가 맞음");
+  } else {
+    score -= 1;
+  }
 
-  if(a.energy !== b.energy) s += 2;
+  if(a.conflict === b.conflict){
+    score += 2;
+    reasons.push("갈등 해결 방식이 유사");
+  }
 
-  if(a.suffering === b.suffering) s += 4;
+  if(a.energy !== b.energy){
+    score += 2;
+    reasons.push("에너지 흐름이 보완적");
+  }
 
-  return s;
+  if(a.suffering === b.suffering){
+    score += 4;
+    reasons.push("괴로움을 다루는 방식이 같음");
+  }
+
+  return {score, reasons};
 }
 
 // 등록
 app.post('/register',(req,res)=>{
   const exists = users.find(u => u.name === req.body.name);
+
   if(!exists){
     users.push(req.body);
   }
+
   res.json({ok:true});
 });
 
-// 매칭
-app.post('/match',(req,res)=>{
+// 탐색 (추천 리스트)
+app.post('/explore',(req,res)=>{
   const me = req.body;
 
   const result = users
     .filter(u => u.name !== me.name)
-    .map(u=>({...u, score:score(me,u)}))
+    .map(u=>{
+      const result = analyze(me,u);
+      return {...u, ...result};
+    })
     .sort((a,b)=>b.score-a.score)
     .slice(0,10);
 
   res.json(result);
 });
 
-// 좋아요
+// 관심
 app.post('/like',(req,res)=>{
   const {from,to} = req.body;
-
-  if(!dailyLikes[from]) dailyLikes[from]=0;
-
-  if(dailyLikes[from] >= 5){
-    return res.json({ok:false, msg:"오늘 좋아요 제한"});
-  }
 
   const exists = likes.find(l => l.from===from && l.to===to);
 
   if(!exists){
     likes.push({from,to});
-    dailyLikes[from]++;
   }
 
   res.json({ok:true});
 });
 
-// 상호 매칭
-app.get('/matches/:name',(req,res)=>{
+// 연결 (상호 좋아요)
+app.get('/connections/:name',(req,res)=>{
   const me = req.params.name;
 
-  const mutual = likes.filter(l =>
+  const matched = likes.filter(l =>
     l.from === me &&
     likes.find(x => x.from === l.to && x.to === me)
   );
 
-  res.json(mutual);
+  res.json(matched);
 });
 
 app.listen(3000, ()=>console.log("running"));
